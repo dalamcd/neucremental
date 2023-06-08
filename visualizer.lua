@@ -227,21 +227,8 @@ local function drawOutputs(surface, N)
 	love.graphics.print(string.format(": %.2f", highVal), highPx + r + 4, highPy - th/2)
 end
 
-local function drawInfo(surface, N)
-	love.graphics.clear()
-	local w, h = surface.w, surface.h
-	local margin = 20
-	local x = margin
-	local y = margin
-	local step = 15
-	love.graphics.print("Iteration: " .. tostring(N.iter), x, y)
-	love.graphics.print("Cost: " .. string.format("%.6f", N.lastCost), x, y + step*1)
-	love.graphics.print("FPS: "..tostring(love.timer.getFPS( )), x, y + step*2)
-end
-
 local function drawText(surface, str)
 	love.graphics.clear()
-	-- love.graphics.printf(str, 0, 0, surface.w, "left")
 	love.graphics.printf(str, 0, 0, surface.w, "left")
 end
 
@@ -277,7 +264,6 @@ end
 return {
 	drawNetwork = drawNetwork,
 	drawOutputs = drawOutputs,
-	drawInfo = drawInfo,
 	renderGrid = renderGrid,
 	gridCell = gridCell,
 	drawGraph = drawGraph,
