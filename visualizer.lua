@@ -47,7 +47,7 @@ end
 	|__|___|____|
 	|_____|_____|
 ]]
-local function drawGrid(rows, w, h)
+local function renderGrid(rows, w, h)
 	local ystep = h/#rows
 	love.graphics.setLineWidth(1)
 
@@ -83,7 +83,7 @@ local function drawGrid(rows, w, h)
 	end
 end
 
--- returns the x position, y position, width, and height of any cell created by drawGrid()
+-- returns the x position, y position, width, and height of any cell created by renderGrid()
 local function gridCell(rows, w, h, row, col)
 	local cols = rows[row]
 	local ystep = h/#rows
@@ -278,7 +278,7 @@ return {
 	drawNetwork = drawNetwork,
 	drawOutputs = drawOutputs,
 	drawInfo = drawInfo,
-	drawGrid = drawGrid,
+	renderGrid = renderGrid,
 	gridCell = gridCell,
 	drawGraph = drawGraph,
 	drawText = drawText,

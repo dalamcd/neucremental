@@ -64,7 +64,7 @@ local function load()
 	-- initialize a network with 2 inputs, 1 hidden layer with 2 neurons, and 1 output
 	nn = network:new({2, 2, 1})
 	-- a table representing the grid where we will draw our network
-	-- see the documentation on drawGrid()
+	-- see the documentation on renderGrid()
 	grid = {1, 4}
 	-- create drawing surfaces to display the network and our test outputs
 	networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
@@ -82,7 +82,7 @@ end
 local function draw()
 
 	-- draw the grid
-	v.drawGrid(grid, sw, sh)
+	v.renderGrid(grid, sw, sh)
 
 	-- update the surfaces
 
@@ -120,11 +120,11 @@ local function draw()
 	-- switch back to the main canvas
 	love.graphics.setCanvas()
 	-- draw the surfaces onto the main canvas
-	instance.drawSurface(networkSurface)
-	instance.drawSurface(outputSurface1)
-	instance.drawSurface(outputSurface2)
-	instance.drawSurface(outputSurface3)
-	instance.drawSurface(outputSurface4)
+	instance.renderSurface(networkSurface)
+	instance.renderSurface(outputSurface1)
+	instance.renderSurface(outputSurface2)
+	instance.renderSurface(outputSurface3)
+	instance.renderSurface(outputSurface4)
 end
 
 return {

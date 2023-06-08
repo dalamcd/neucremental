@@ -235,7 +235,7 @@ end
 
 local function draw()
 	-- draw the grid for our layout
-	v.drawGrid(grid, love.graphics.getWidth(), love.graphics.getHeight())
+	v.renderGrid(grid, love.graphics.getWidth(), love.graphics.getHeight())
 
 	-- update surfaces as necessary
 
@@ -278,11 +278,11 @@ local function draw()
 		v.drawText(textSurface, controls)
 	-- draw the surfaces to the main canvas
 	love.graphics.setCanvas()
-	instance.drawSurface(networkSurface)
-	instance.drawSurface(graphSurface)
-	instance.drawSurface(pixelSurface)
-	instance.drawSurface(outputSurface)
-	instance.drawSurface(textSurface)
+	instance.renderSurface(networkSurface)
+	instance.renderSurface(graphSurface)
+	instance.renderSurface(pixelSurface)
+	instance.renderSurface(outputSurface)
+	instance.renderSurface(textSurface)
 end
 
 local function keypressed(key, scancode, isrepeat)

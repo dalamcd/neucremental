@@ -49,7 +49,7 @@ nn:learn(trainingData, expectedOutputs)
 learn() can take an optional third parameter, the learning rate, which defaults to 1.
 
 ## Visualization interface and instance library
-The instance library provides two helper functions for drawing to the screen, createSurface() and drawSurface(), and most visulization functions take a surface as a parameter. Any visulizations are first drawn to the surface, and then the surfaces are rendered to the screen.
+The instance library provides two helper functions for drawing to the screen, createSurface() and renderSurface(), and most visulization functions take a surface as a parameter. Any visulizations are first drawn to the surface, and then the surfaces are rendered to the screen.
 ```
 instance = require("instance")
 visualizer = require("visualizer")
@@ -66,13 +66,13 @@ function draw()
   -- tell LOVE we are now drawing to the main canvas
   love.graphics.setCanvas()
   -- render that surface to the screen
-  instance.drawSurface(networkSurface)
+  instance.renderSurface(networkSurface)
 end
 ```
 
-### drawGrid() and gridCell()
+### renderGrid() and gridCell()
 The visualizer offers two functions which work nicely with createSurface() to divide the screen into a grid and then draw things--e.g. a picture of the network, a graph of the cost, and a view of the latest outputs--to specific sections of that grid.
-drawGrid() takes a rows table as a parameter, as well as the total width and height of the grid. Each element of the rows table can be a number or another table. If it is a number N, that row is evenly divided into N columns. If it is a table with M elements, the row is divided into M columns, where the width of each column is a fraction of the sum of the elements. For instance, a row like {3, 1} will be divided into two columns, where the first column takes up 3/4ths of the row and the second column takes up the remaining 1/4th.
+renderGrid() takes a rows table as a parameter, as well as the total width and height of the grid. Each element of the rows table can be a number or another table. If it is a number N, that row is evenly divided into N columns. If it is a table with M elements, the row is divided into M columns, where the width of each column is a fraction of the sum of the elements. For instance, a row like {3, 1} will be divided into two columns, where the first column takes up 3/4ths of the row and the second column takes up the remaining 1/4th.
 Example:
 ```
 rows = {
@@ -88,19 +88,19 @@ _____________
 |__|___|____|
 |_____|_____|
 ```
-One important note, drawGrid() expects to be drawn to the main canvas, not a separate surface.
+One important note, renderGrid() expects to be drawn to the main canvas, not a separate surface.
 
-gridCell() takes the same parameters as drawGrid() as well as a row number and column number, and will return the x position, y position, width and height of that cell.
+gridCell() takes the same parameters as renderGrid() as well as a row number and column number, and will return the x position, y position, width and height of that cell.
 
 You can use this in conjuction with a createSurface() to easily comparmentalize views. Using the example grid above:
 ```
 rows = { 3, {1, 2, 3}, 2 }
 -- create a surface in the cell at row 1, column 1
-topLeftSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 1, 1)
+topLeftSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 1, 1))
 -- create a surface in the cell at row 2, column 2
-middleMiddleSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 2, 2)
+middleMiddleSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 2, 2))
  -- create a surface in the cell at row 3, column 2
-bottomRightSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 3, 2)
+bottomRightSurface = instance.createSurface(visualizer.gridCell(rows, 100, 100, 3, 2))
 
 function draw()
   love.graphics.setCanvas(topLeftsurface)
@@ -111,8 +111,8 @@ function draw()
     -- return to the main canvas
     love.graphics.setCanvas()
     -- draw the grid to the main canvas
-    visualizer.drawGrid(rows, 100, 100)
+    visualizer.renderGrid(rows, 100, 100)
     -- draw the surfaces to the main canvas
-    instance.drawSurface(topLeftSurface)
+    instance.renderSurface(topLeftSurface)
 end
 ```

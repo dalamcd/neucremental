@@ -16,7 +16,7 @@ local function createSurface(x, y, w, h)
 	}
 end
 
-local function drawSurface(surface)
+local function renderSurface(surface)
 	love.graphics.draw(surface.canvas, math.floor(surface.x), math.floor(surface.y))
 end
 
@@ -77,7 +77,7 @@ end
 
 return {
 	createSurface = createSurface,
-	drawSurface = drawSurface,
+	renderSurface = renderSurface,
 	convertToBatches = convertToBatches,
 	shuffleArray = shuffleArray,
 	shuffleBatches = shuffleBatches,

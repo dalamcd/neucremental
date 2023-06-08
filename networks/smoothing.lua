@@ -142,14 +142,14 @@ local function draw()
 		"current picture of the source. Press the spacebar to see an upscaled version of the network's picture " ..
 		"of the low resolution image, displayed in the third space")
 	love.graphics.setCanvas()
-	instance.drawSurface(inputSurface)
-	instance.drawSurface(outputSurface)
-	instance.drawSurface(graphSurface)
-	instance.drawSurface(upscaleSurface)
-	instance.drawSurface(networkSurface)
-	instance.drawSurface(textSurface)
+	instance.renderSurface(inputSurface)
+	instance.renderSurface(outputSurface)
+	instance.renderSurface(graphSurface)
+	instance.renderSurface(upscaleSurface)
+	instance.renderSurface(networkSurface)
+	instance.renderSurface(textSurface)
 
-	v.drawGrid(grid, sw, sh)
+	v.renderGrid(grid, sw, sh)
 end
 
 local function keypressed(key, scancode, isrepeat)
