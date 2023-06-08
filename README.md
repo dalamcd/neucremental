@@ -16,7 +16,7 @@ At startup, the app will look in the networks directory and load any Lua files (
 
 load() is called once as soon as the instance is selected. Once loaded, on every frame update() is called followed by draw(). Any drawing operations that occur outside of draw() are not valid and won't be rendered.
 
-A few example networks are included in the repo. 
+A few example networks are included in the repo. Credit to the [MNIST hand written digit](https://yann.lecun.com/exdb/mnist/) dataset for the data used in some of the examples.
 
 ## Network interface
 Creating a new network is simple:
