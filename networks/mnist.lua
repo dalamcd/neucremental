@@ -28,7 +28,7 @@ local trainingInputs
 local expectedOutputs
 local inputBatches, expectedBatches
 local updateOutputView = false
-local iterations = 0
+local iterations
 local drawInputs = false
 
 -- surfaces
@@ -144,6 +144,7 @@ local function load()
 	highAvg = -math.huge
 	totalCost = 0
 	costSamples = 0
+	iterations = 0
 
 	-- load MNIST dataset
 	if images and labels then
@@ -260,15 +261,15 @@ local function draw()
 		totalCost = totalCost + lastCost
 		local avg = totalCost/costSamples
 		table.insert(graphdata, avg)
-		-- update the highest cost value if necessary, so we can draw our graph properly
+		-- update the highest average cost value if necessary, so we can draw our graph properly
 		if avg > highAvg then highAvg = avg end
 	end
 
-	-- redraw the graph
+	-- draw the graph
 	love.graphics.setCanvas(graphSurface.canvas)
 		v.drawGraph(graphSurface, graphdata, 0, highAvg)
 
-	-- update the pixel canvas
+	-- draw the pixel canvas
 	love.graphics.setCanvas(pixelSurface.canvas)
 		drawPixelGrid(pixelSurface, 28, 28)
 
