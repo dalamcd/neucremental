@@ -114,5 +114,7 @@ function draw()
     visualizer.renderGrid(rows, 100, 100)
     -- draw the surfaces to the main canvas
     instance.renderSurface(topLeftSurface)
+    instance.renderSurface(middleMiddleSurface)
+    instance.renderSurface(bottomRightSurface)
 end
 ```
