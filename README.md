@@ -110,9 +110,9 @@ function draw()
 
     -- return to the main canvas
     love.graphics.setCanvas()
-    -- draw the grid to the main canvas
+    -- render the grid to the main canvas
     visualizer.renderGrid(rows, 100, 100)
-    -- draw the surfaces to the main canvas
+    -- render the surfaces to the main canvas
     instance.renderSurface(topLeftSurface)
     instance.renderSurface(middleMiddleSurface)
     instance.renderSurface(bottomRightSurface)
