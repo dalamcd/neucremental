@@ -61,24 +61,27 @@ function network:backprop(ti, to)
 
 		local last = self.layers[#self.layers]
 		for j=1, last.numNodes do
-			last.derivs[j] = last.outputs[j] - to[i][j]
+			last.derivs[j] = 2*(last.outputs[j] - to[i][j])
 		end
 
 		for l=#self.layers, 1, -1 do
 			for j=1, self.layers[l].numNodes do
 				local a = self.layers[l].outputs[j]
 				local da = self.layers[l].derivs[j]
-				self.layers[l].biasGradients[j] = self.layers[l].biasGradients[j] + 2*da*a*(1 - a)
+				local q = self.layers[l].activationPrime(self.layers[l].inputs[j])
+				-- local q = a*(a-1) -- sigmoid derivative
+				-- local q = a >= 0 and 1 or 0 -- relu derivative
+				self.layers[l].biasGradients[j] = self.layers[l].biasGradients[j] + da*q
 				for k=1, self.layers[l].numInputs do
 					local pa
 					if l > 1 then
 						local w = self.layers[l].weights[j][k]
-						self.layers[l - 1].derivs[k] = self.layers[l - 1].derivs[k] + 2*da*a*(1 - a)*w
+						self.layers[l - 1].derivs[k] = self.layers[l - 1].derivs[k] + da*q*w
 						pa = self.layers[l - 1].outputs[k]
 					else
 						pa = ti[i][k]
 					end
-					self.layers[l].weightGradients[j][k] = self.layers[l].weightGradients[j][k] + 2*da*a*(1 - a)*pa
+					self.layers[l].weightGradients[j][k] = self.layers[l].weightGradients[j][k] + da*q*pa
 				end
 			end
 		end
