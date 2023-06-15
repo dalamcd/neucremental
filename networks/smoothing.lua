@@ -17,7 +17,7 @@ local instance = require("instance")
 local v = require("visualizer")
 
 -- network data
-local imgPath = "networks/10525.png"
+local imgPath = "networks/colortest.png"
 local pixels, imgw, imgh
 local inputs, expected
 local inputBatches, expectedBatches
@@ -54,7 +54,7 @@ local function load()
 	expected = {}
 	inputs = {}
 	graphdata = {}
-	nn = network:new({2, 8, 8, 3})
+	nn = network:new({2, 7, 7, 3})
 
 	local imgData = love.image.newImageData(imgPath)
 	imgw, imgh = imgData:getWidth(), imgData:getHeight()
@@ -67,7 +67,7 @@ local function load()
 		end
 	end
 
-	inputBatches, expectedBatches = instance.convertToBatches(8, inputs, expected)
+	inputBatches, expectedBatches = instance.convertToBatches(12, inputs, expected)
 end
 
 local iter = 0
@@ -135,7 +135,8 @@ local function draw()
 	end
 
 	love.graphics.setCanvas(networkSurface.canvas)
-		v.drawNetwork(networkSurface, nn, false)
+		v.drawCake(networkSurface, nn)
+		-- v.drawNetwork(networkSurface, nn, false)
 
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, "The leftmost view shows the source image, the next view shows the network's " ..

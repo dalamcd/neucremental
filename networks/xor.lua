@@ -65,7 +65,7 @@ local function load()
 	nn = network:new({2, 2, 1})
 	-- a table representing the grid where we will draw our network
 	-- see the documentation on renderGrid()
-	grid = {1, 4}
+	grid = {2, 4}
 	-- create drawing surfaces to display the network and our test outputs
 	networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
 	outputSurface1 = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))

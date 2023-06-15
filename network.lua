@@ -69,8 +69,6 @@ function network:backprop(ti, to)
 				local a = self.layers[l].outputs[j]
 				local da = self.layers[l].derivs[j]
 				local q = self.layers[l].activationPrime(self.layers[l].inputs[j])
-				-- local q = a*(a-1) -- sigmoid derivative
-				-- local q = a >= 0 and 1 or 0 -- relu derivative
 				self.layers[l].biasGradients[j] = self.layers[l].biasGradients[j] + da*q
 				for k=1, self.layers[l].numInputs do
 					local pa

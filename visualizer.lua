@@ -7,6 +7,10 @@
 
 local rad = 10
 local linew = 1
+local posBCol = { love.math.colorFromBytes(0x00, 0x00, 0xFF, 0xFF) }
+local negBCol = { love.math.colorFromBytes(0x05, 0x05, 0x20, 0xFF) }
+local posWCol = { love.math.colorFromBytes(0x00, 0xFF, 0x00, 0xFF) }
+local negWCol = { love.math.colorFromBytes(0xFF, 0x00, 0xFF, 0xFF) }
 
 love.graphics.setNewFont(14)
 
@@ -47,9 +51,10 @@ end
 	|__|___|____|
 	|_____|_____|
 ]]
-local function renderGrid(rows, w, h)
+local function renderGrid(rows, w, h, lw)
 	local ystep = h/#rows
-	love.graphics.setLineWidth(1)
+	lw = lw or 1
+	love.graphics.setLineWidth(lw)
 
 	for i, cols in ipairs(rows) do
 		-- horizontal line
@@ -84,14 +89,15 @@ local function renderGrid(rows, w, h)
 end
 
 -- returns the x position, y position, width, and height of any cell created by renderGrid()
-local function gridCell(rows, w, h, row, col)
+local function gridCell(rows, w, h, row, col, gap)
+	gap = gap or 0
 	local cols = rows[row]
 	local ystep = h/#rows
 	local x, xstep, width
 	if type(rows[row]) == "number" then
 		xstep = w/rows[row]
-		x = xstep*(col - 1)
-		width = xstep
+		x = xstep*(col - 1) + gap
+		width = xstep - gap*2
 	elseif type(rows[row]) == "table" then
 		local total = 0
 		local steps = 0
@@ -103,14 +109,14 @@ local function gridCell(rows, w, h, row, col)
 			end
 		end
 		xstep = w/total
-		x = xstep*steps
-		width = xstep*cols[col]
+		x = xstep*steps + gap
+		width = xstep*cols[col] - gap*2
 	else
 		error("invalid grid format, row elements must be of type number or table")
 	end
 
-	local y = ystep*(row - 1)
-	local height = ystep
+	local y = ystep*(row - 1) + gap
+	local height = ystep - gap*2
 
 	return x, y, width, height
 end
@@ -125,11 +131,6 @@ local function drawNetwork(surface, N, drawInputs)
 	local sub = drawInputs and 0 or 1
 	local xstep = (w/(#N.layers + 1 - sub))
 	local ystep
-
-	local posBCol = { love.math.colorFromBytes(0x00, 0x00, 0xFF, 0xFF) }
-	local negBCol = { love.math.colorFromBytes(0x05, 0x05, 0x20, 0xFF) }
-	local posWCol = { love.math.colorFromBytes(0x00, 0xFF, 0x00, 0xFF) }
-	local negWCol = { love.math.colorFromBytes(0xFF, 0x00, 0xFF, 0xFF) }
 
 	love.graphics.clear()
 	-- draw connections
@@ -151,7 +152,7 @@ local function drawNetwork(surface, N, drawInputs)
 					local py = pystep*k - pystep/2
 					local weight = N.layers[i].weights[j][k]
 					local lw = linew + math.abs(weight)
-					local color = blendColors(posWCol, negWCol, sigmoid(weight))
+					local color = blendColors(negWCol, posWCol, sigmoid(weight))
 					love.graphics.setColor(color)
 					love.graphics.setLineWidth(lw)
 					love.graphics.line(x, y, px, py)
@@ -168,7 +169,7 @@ local function drawNetwork(surface, N, drawInputs)
 		for j=1, l.numNodes do
 			local y = ystep*j - ystep/2
 			local b = N.layers[i].biases[j]
-			local color = blendColors(posBCol, negBCol, sigmoid(b))
+			local color = blendColors(negBCol, posBCol, sigmoid(b))
 			love.graphics.setColor(color)
 			love.graphics.circle("fill", x, y, rad + math.abs(b))
 			love.graphics.setColor(1, 1, 1, 1)
@@ -190,6 +191,37 @@ local function drawNetwork(surface, N, drawInputs)
 	end
 	love.graphics.setLineWidth(1)
 	love.graphics.setColor(1, 1, 1, 1)
+end
+
+local function drawWeights(x, y, w, h, weightArr)
+	local innerGap = 2
+	for i, nodeWeights in ipairs(weightArr) do
+		for j, weight in ipairs(nodeWeights) do
+			local color = blendColors(negWCol, posWCol, sigmoid(weight))
+			love.graphics.setColor(color)
+			love.graphics.rectangle("fill",
+				x + innerGap + w/#weightArr*(i - 1),
+				y + innerGap + h/#nodeWeights*(j - 1),
+				w/#weightArr - innerGap*2,
+				h/#nodeWeights - innerGap*2)
+		end
+	end
+end
+
+local function drawCake(surface, N)
+	love.graphics.clear()
+
+	 local grid = {}
+	 for l=1, #N.layers do
+		table.insert(grid, 1)
+	 end
+
+	 for l=1, #N.layers do
+		local x, y, w, h = gridCell(grid, surface.w, surface.h, l, 1, 10)
+		drawWeights(x, y, w, h, N.layers[l].weights)
+	end
+	love.graphics.setColor(1, 1, 1, 1)
+	-- renderGrid(grid, surface.w, surface.h, 5)
 end
 
 -- visualizes the outputs of the provided network and highlights the highest neuron
@@ -268,4 +300,6 @@ return {
 	gridCell = gridCell,
 	drawGraph = drawGraph,
 	drawText = drawText,
+	drawWeights = drawWeights,
+	drawCake = drawCake,
 }
