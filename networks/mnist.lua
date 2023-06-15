@@ -33,13 +33,14 @@ local drawInputs = false
 
 -- surfaces
 local sw, sh = love.graphics.getWidth(), love.graphics.getHeight()
-local grid = {{4, 1, 1}, {3, 2}}
+local grid = {{2, 2, 1, 1}, {3, 2}}
 
 local networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
-local outputSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 2))
+local outputSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 3))
 local graphSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))
 local pixelSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 2))
-local textSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 3))
+local textSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 4))
+local cakeSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 2))
 
 -- helper function to read the MNIST dataset
 local function read_bytes(file)
@@ -273,6 +274,9 @@ local function draw()
 	love.graphics.setCanvas(pixelSurface.canvas)
 		drawPixelGrid(pixelSurface, 28, 28)
 
+	love.graphics.setCanvas(cakeSurface.canvas)
+		v.drawNetworkHeatmap(cakeSurface, nn)
+
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
 		"  Left mouse - draw pixels\n  Right mouse - erase pixels"
 	love.graphics.setCanvas(textSurface.canvas)
@@ -284,6 +288,7 @@ local function draw()
 	instance.renderSurface(pixelSurface)
 	instance.renderSurface(outputSurface)
 	instance.renderSurface(textSurface)
+	instance.renderSurface(cakeSurface)
 end
 
 local function keypressed(key, scancode, isrepeat)
