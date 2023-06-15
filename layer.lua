@@ -7,7 +7,31 @@
 
 local layer = {}
 
-function layer:new(inputs, nodes, activationFnc)
+local function sigmoid(x)
+	return 1 / (1 + math.exp(-x))
+end
+
+local function sigmoidPrime(x)
+	return sigmoid(x)*(1 - sigmoid(x))
+end
+
+local function relu(x)
+	return x > 0 and x or 0
+end
+
+local function reluPrime(x)
+	return x > 0 and 1 or 0
+end
+
+local function leakyRelu(x)
+	return x > 0 and x or x*0.01
+end
+
+local function leakyReluPrime(x)
+	return x >= 0 and 1 or 0.01
+end
+
+function layer:new(numInputs, numNodes, activationFnc, activationPrime)
 
 	local o = {}
 	local weights = {}
@@ -15,19 +39,18 @@ function layer:new(inputs, nodes, activationFnc)
 	local weightGradients = {}
 	local biasGradients = {}
 	local outputs = {}
+	local inputs = {}
 
-	-- default to sigmoid activation, no way to set this currently
-	activationFnc = activationFnc or function(x)
-		return 1 / (1 + math.exp(-x))
-	end
+	activationFnc = activationFnc or sigmoid
+	activationPrime = activationPrime or sigmoidPrime
 
-	for i=1, nodes do
+	for i=1, numNodes do
 		weights[i] = {}
 		weightGradients[i] = {}
 		biases[i] = math.random() - 0.5
 		biasGradients[i] = 0
 		outputs[i] = 0
-		for j=1, inputs do
+		for j=1, numInputs do
 			weights[i][j] = math.random() - 0.5
 			weightGradients[i][j] = 0
 		end
@@ -38,11 +61,13 @@ function layer:new(inputs, nodes, activationFnc)
 	o.weightGradients = weightGradients
 	o.biasGradients = biasGradients
 	o.activationFnc = activationFnc
+	o.activationPrime = activationPrime
 	o.derivs = {}
 	o.outputs = outputs
+	o.inputs = inputs
 
-	o.numNodes = nodes
-	o.numInputs = inputs
+	o.numNodes = numNodes
+	o.numInputs = numInputs
 
 	setmetatable(o, self)
 	self.__index = self
@@ -60,15 +85,18 @@ end
 
 function layer:forward(inputArr)
 	local outputs = {}
+	local inputs = {}
 	for i=1, self.numNodes do
 		outputs[i] = 0
 		for j=1, self.numInputs do
 			local weightedInput = (inputArr[j]*self.weights[i][j])
 			outputs[i] = outputs[i] + weightedInput
 		end
+		inputs[i] = outputs[i] + self.biases[i]
 		outputs[i] = self.activationFnc(outputs[i] + self.biases[i])
 	end
 	self.outputs = outputs
+	self.inputs = inputs
 	return outputs
 end
 
