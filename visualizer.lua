@@ -193,7 +193,7 @@ local function drawNetwork(surface, N, drawInputs)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-local function drawWeights(x, y, w, h, weightArr)
+local function drawLayerHeatmap(x, y, w, h, weightArr)
 	local innerGap = 2
 	for i, nodeWeights in ipairs(weightArr) do
 		for j, weight in ipairs(nodeWeights) do
@@ -208,7 +208,7 @@ local function drawWeights(x, y, w, h, weightArr)
 	end
 end
 
-local function drawCake(surface, N)
+local function drawNetworkHeatmap(surface, N)
 	love.graphics.clear()
 
 	 local grid = {}
@@ -218,7 +218,7 @@ local function drawCake(surface, N)
 
 	 for l=1, #N.layers do
 		local x, y, w, h = gridCell(grid, surface.w, surface.h, l, 1, 10)
-		drawWeights(x, y, w, h, N.layers[l].weights)
+		drawLayerHeatmap(x, y, w, h, N.layers[l].weights)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
 	-- renderGrid(grid, surface.w, surface.h, 5)
@@ -300,6 +300,5 @@ return {
 	gridCell = gridCell,
 	drawGraph = drawGraph,
 	drawText = drawText,
-	drawWeights = drawWeights,
-	drawCake = drawCake,
+	drawNetworkHeatmap = drawNetworkHeatmap,
 }

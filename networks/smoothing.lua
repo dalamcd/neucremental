@@ -135,7 +135,7 @@ local function draw()
 	end
 
 	love.graphics.setCanvas(networkSurface.canvas)
-		v.drawCake(networkSurface, nn)
+		v.drawNetworkHeatmap(networkSurface, nn)
 		-- v.drawNetwork(networkSurface, nn, false)
 
 	love.graphics.setCanvas(textSurface.canvas)

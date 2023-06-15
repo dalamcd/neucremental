@@ -275,7 +275,7 @@ local function draw()
 		drawPixelGrid(pixelSurface, 28, 28)
 
 	love.graphics.setCanvas(cakeSurface.canvas)
-		v.drawCake(cakeSurface, nn)
+		v.drawNetworkHeatmap(cakeSurface, nn)
 
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
 		"  Left mouse - draw pixels\n  Right mouse - erase pixels"
