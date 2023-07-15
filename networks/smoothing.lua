@@ -17,11 +17,13 @@ local instance = require("instance")
 local v = require("visualizer")
 
 -- network data
-local imgPath = "networks/colortest.png"
+local imgPath = "networks/alphatest.png"
 local pixels, imgw, imgh
 local inputs, expected
 local inputBatches, expectedBatches
 local nn
+
+local view = 0
 
 -- graph data
 local graphdata
@@ -36,6 +38,23 @@ local graphSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))
 local upscaleSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 3))
 local networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 2))
 local textSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 4))
+
+local function screenCoordToGridCoord(mx, my, x, y, w, h, scalar)
+	local lx, ly = mx - x, my - y
+
+	if lx >= 0 and ly >= 0 then
+		local gx = math.floor(lx/scalar)
+		local gy = math.floor(ly/scalar)
+		if gx <= w and gy <= h then
+			return gx, gy
+		else
+			return -1, -1
+		end
+	else
+		return -1, -1
+	end
+
+end
 
 local function drawPixels(x, y, w, h, pixelArr, scalar)
 	scalar = scalar or 1
@@ -54,7 +73,7 @@ local function load()
 	expected = {}
 	inputs = {}
 	graphdata = {}
-	nn = network:new({2, 7, 7, 3})
+	nn = network:new({2, 7, 9, 7, 3})
 
 	local imgData = love.image.newImageData(imgPath)
 	imgw, imgh = imgData:getWidth(), imgData:getHeight()
@@ -62,7 +81,7 @@ local function load()
 		for j=0, imgh - 1 do
 			local r, g, b, a = imgData:getPixel(i, j)
 			expected[imgw*i + j + 1] = {r, g, b}
-			pixels[imgw*i + j + 1] = {r, g, b, 1}
+			pixels[imgw*i + j + 1] = {r, g, b, a}
 			table.insert(inputs, {i/imgw, j/imgh})
 		end
 	end
@@ -70,10 +89,10 @@ local function load()
 	inputBatches, expectedBatches = instance.convertToBatches(12, inputs, expected)
 end
 
-local iter = 0
+local iterations = 0
 local highCost = -math.huge
 local function update()
-	iter = iter + 1
+	iterations = iterations + 1
 	instance.shuffleArray(inputBatches, expectedBatches)
 	for i=1, #inputBatches do
 		local trainArr, expectArr = inputBatches[i], expectedBatches[i]
@@ -111,7 +130,7 @@ local function draw()
 			drawPixels(x, y, 256, 256, upscaledPixels)
 	end
 
-	if iter % 50 == 0 then
+	if iterations % 50 == 0 then
 		love.graphics.setCanvas(outputSurface.canvas)
 			local pixelsOut = {}
 			for i=0, imgw - 1 do
@@ -125,7 +144,7 @@ local function draw()
 			drawPixels(x, y, imgw, imgh, pixelsOut, scalar)
 	end
 
-	if iter % 10 == 0 then
+	if iterations % 10 == 0 then
 		local lastCost = nn:cost(inputs, expected)
 		table.insert(graphdata, lastCost)
 		if lastCost > highCost then highCost = lastCost end
@@ -135,13 +154,25 @@ local function draw()
 	end
 
 	love.graphics.setCanvas(networkSurface.canvas)
-		v.drawNetworkHeatmap(networkSurface, nn)
-		-- v.drawNetwork(networkSurface, nn, false)
+		if view == 0 then
+			v.drawNetwork(networkSurface, nn, true)
+		elseif view == 1 then
+			v.drawNetworkHeatmap(networkSurface, nn)
+		elseif view == 2 then
+			local mx, my = love.mouse.getPosition()
+			local x = outputSurface.w/2 - imgw*scalar/2
+			local y = outputSurface.h/2 - imgh*scalar/2
+			local gx, gy = screenCoordToGridCoord(mx, my, x, y, imgw, imgh, scalar)
+			if gx >= 0 then
+				nn:forward({gx/imgw, gy/imgh})
+				v.drawActivationHeatmap(networkSurface, nn)
+			end
+		end
 
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, "The leftmost view shows the source image, the next view shows the network's " ..
 		"current picture of the source. Press the spacebar to see an upscaled version of the network's picture " ..
-		"of the low resolution image, displayed in the third space")
+		"of the low resolution image displayed in the third space")
 	love.graphics.setCanvas()
 	instance.renderSurface(inputSurface)
 	instance.renderSurface(outputSurface)
@@ -156,6 +187,9 @@ end
 local function keypressed(key, scancode, isrepeat)
 	if key == "space" then
 		drawUpscaledImage = true
+	end
+	if key == "tab" then
+		view = (view + 1) % 3
 	end
 end
 

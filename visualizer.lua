@@ -18,8 +18,13 @@ local function sigmoid(x)
 	return 1 / (1 + math.exp(-x))
 end
 
+local function squash(val, min, max, newMin, newMax)
+	local norm = (val - min)/(max - min)
+	return norm*(newMax - newMin) + newMin
+end
+
 local function blendColorChannel(c1, c2, t)
-    return math.sqrt((1 - t)*c1^2 + t*c2^2)
+    return (1 - t)*c1 + t*c2
 end
 
 local function blendColors(c1, c2, t)
@@ -27,7 +32,7 @@ local function blendColors(c1, c2, t)
 		blended[1] = blendColorChannel(c1[1], c2[1], t)
 		blended[2] = blendColorChannel(c1[2], c2[2], t)
 		blended[3] = blendColorChannel(c1[3], c2[3], t)
-		blended[4] = c1[4]*(1 - t) + c2[4]*t
+		blended[4] = blendColorChannel(c1[4], c2[4], t)
 	return blended
 end
 
@@ -193,35 +198,77 @@ local function drawNetwork(surface, N, drawInputs)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-local function drawLayerHeatmap(x, y, w, h, weightArr)
+local function drawLayerHeatmap(x, y, w, h, weights, biases)
 	local innerGap = 2
-	for i, nodeWeights in ipairs(weightArr) do
+
+	local bmax, bmin = -math.huge, math.huge
+	for _, b in ipairs(biases) do
+		if b > bmax then bmax = b end
+		if b < bmin then bmin = b end
+	end
+
+	for i, nodeWeights in ipairs(weights) do
+		local b = squash(biases[i], bmin, bmax, 0, 1)
+		local bfactor = (1 - b)*10
 		for j, weight in ipairs(nodeWeights) do
 			local color = blendColors(negWCol, posWCol, sigmoid(weight))
 			love.graphics.setColor(color)
 			love.graphics.rectangle("fill",
-				x + innerGap + w/#weightArr*(i - 1),
+				x + innerGap + w/#weights*(i - 1) + bfactor,
 				y + innerGap + h/#nodeWeights*(j - 1),
-				w/#weightArr - innerGap*2,
+				w/#weights - innerGap*2 - bfactor*2,
 				h/#nodeWeights - innerGap*2)
 		end
 	end
+end
+
+local function drawLayerActivationHeatmap(x, y, w, h, weightArr)
+	local innerGap = 2
+	for i, nodeWeights in ipairs(weightArr) do
+		for j, weight in ipairs(nodeWeights) do
+			local color = blendColors({0.01, 0.01, 0.01, 1}, {0.01, 1, 0.01, 1}, math.max(0.05, math.min(1, weight)))
+			love.graphics.setColor(color)
+			love.graphics.rectangle("fill",
+				x + innerGap + w/#nodeWeights*(j - 1),
+				y + innerGap + h/#weightArr*(i - 1),
+				w/#nodeWeights - innerGap*2,
+				h/#weightArr - innerGap*2)
+		end
+	end
+end
+
+local function drawActivationHeatmap(surface, N)
+	love.graphics.clear()
+
+	local layerTable = {}
+	table.insert(layerTable, {N.layers[1].inputs})
+
+	local grid = {1}
+	for l=1, #N.layers do
+		table.insert(grid, 1)
+		table.insert(layerTable, {N.layers[l].outputs})
+	end
+
+	for i=1, #layerTable do
+		local x, y, w, h = gridCell(grid, surface.w, surface.h, i, 1, 10)
+		drawLayerActivationHeatmap(x, y, w, h, layerTable[i])
+	end
+	love.graphics.setColor(1, 1, 1, 1)
 end
 
 local function drawNetworkHeatmap(surface, N)
 	love.graphics.clear()
 
 	 local grid = {}
-	 for l=1, #N.layers do
+	 for _=1, #N.layers do
 		table.insert(grid, 1)
 	 end
 
 	 for l=1, #N.layers do
 		local x, y, w, h = gridCell(grid, surface.w, surface.h, l, 1, 10)
-		drawLayerHeatmap(x, y, w, h, N.layers[l].weights)
+		drawLayerHeatmap(x, y, w, h, N.layers[l].weights, N.layers[l].biases)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
-	-- renderGrid(grid, surface.w, surface.h, 5)
 end
 
 -- visualizes the outputs of the provided network and highlights the highest neuron
@@ -301,4 +348,5 @@ return {
 	drawGraph = drawGraph,
 	drawText = drawText,
 	drawNetworkHeatmap = drawNetworkHeatmap,
+	drawActivationHeatmap = drawActivationHeatmap,
 }

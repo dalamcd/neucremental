@@ -21,7 +21,7 @@ local function renderSurface(surface)
 end
 
 local function convertToBatches(batchCount, data1, data2)
-	assert(type(batchCount) == "number" and batchCount > 1, "batch count must be a number greater than 1")
+	assert(type(batchCount) == "number" and batchCount > 0, "batch count must be a number greater than 0")
 	assert(data1, "no data provided")
 	if data2 then assert(#data1 == #data2, "can only convert two arrays of equal length") end
 
