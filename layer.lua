@@ -39,7 +39,6 @@ function layer:new(numInputs, numNodes, activationFnc, activationPrime)
 	local weightGradients = {}
 	local biasGradients = {}
 	local outputs = {}
-	local inputs = {}
 
 	activationFnc = activationFnc or sigmoid
 	activationPrime = activationPrime or sigmoidPrime
@@ -62,9 +61,10 @@ function layer:new(numInputs, numNodes, activationFnc, activationPrime)
 	o.biasGradients = biasGradients
 	o.activationFnc = activationFnc
 	o.activationPrime = activationPrime
-	o.derivs = {}
 	o.outputs = outputs
-	o.inputs = inputs
+	o.derivs = {}
+	o.weightedInputs = {}
+	o.inputs = {}
 
 	o.numNodes = numNodes
 	o.numInputs = numInputs
@@ -96,7 +96,8 @@ function layer:forward(inputArr)
 		outputs[i] = self.activationFnc(outputs[i] + self.biases[i])
 	end
 	self.outputs = outputs
-	self.inputs = inputs
+	self.inputs = inputArr
+	self.weightedInputs = inputs
 	return outputs
 end
 

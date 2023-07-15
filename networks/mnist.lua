@@ -14,6 +14,7 @@ local instance = require("instance")
 
 -- pixel data
 local pixels
+local view = 0
 
 -- graph data
 local graphdata
@@ -33,14 +34,13 @@ local drawInputs = false
 
 -- surfaces
 local sw, sh = love.graphics.getWidth(), love.graphics.getHeight()
-local grid = {{2, 2, 1, 1}, {3, 2}}
+local grid = {{4, 1, 1}, {3, 2}}
 
 local networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
-local outputSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 3))
+local outputSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 2))
 local graphSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))
 local pixelSurface = instance.createSurface(v.gridCell(grid, sw, sh, 2, 2))
-local textSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 4))
-local cakeSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 2))
+local textSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 3))
 
 -- helper function to read the MNIST dataset
 local function read_bytes(file)
@@ -185,8 +185,7 @@ local function load()
 	-- stochastic gradient descent: split the data into batches and shuffle each batch. for each
 	-- iteration of training, we will use one of the batches. this will make the cost jump around
 	-- for each iteration, as the network is receiving only a portion of the possible inputs, but 
-	-- the cost will still on average approach its limit over time. this means we can significantly
-	-- speed up training by processing only a fraction of the dataset.
+	-- the cost will still on average approach its limit over time.
 	inputBatches, expectedBatches = instance.convertToBatches(500, trainingInputs, expectedOutputs)
 	instance.shuffleBatches(inputBatches, expectedBatches)
 end
@@ -243,10 +242,15 @@ local function draw()
 
 	-- update the network picture
 	love.graphics.setCanvas(networkSurface.canvas)
-		v.drawNetwork(networkSurface, nn, drawInputs)
+		if view == 0 then
+			v.drawNetwork(networkSurface, nn, drawInputs)
+		elseif view == 1 then
+			v.drawNetworkHeatmap(networkSurface, nn)
+		end
 
-	-- update the output view if something new has been drawn in the pixel view
-	-- or if still training, update the output view occasionally even if nothing new has been drawn
+
+	-- update the output view if something new has been drawn in the pixel view or, if still
+	-- training, update the output view occasionally even if nothing new has been drawn
 	if ((iterations <= 1 or iterations % 100 == 0) and training) or updateOutputView then
 		updateOutputView = false
 		nn:forward(pixels)
@@ -274,9 +278,6 @@ local function draw()
 	love.graphics.setCanvas(pixelSurface.canvas)
 		drawPixelGrid(pixelSurface, 28, 28)
 
-	love.graphics.setCanvas(cakeSurface.canvas)
-		v.drawNetworkHeatmap(cakeSurface, nn)
-
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
 		"  Left mouse - draw pixels\n  Right mouse - erase pixels"
 	love.graphics.setCanvas(textSurface.canvas)
@@ -288,7 +289,6 @@ local function draw()
 	instance.renderSurface(pixelSurface)
 	instance.renderSurface(outputSurface)
 	instance.renderSurface(textSurface)
-	instance.renderSurface(cakeSurface)
 end
 
 local function keypressed(key, scancode, isrepeat)
@@ -300,6 +300,9 @@ local function keypressed(key, scancode, isrepeat)
 	end
 	if key == 'space' then
 		training = not training
+	end
+	if key == 'tab' then
+		view = (view + 1) % 2
 	end
 end
 

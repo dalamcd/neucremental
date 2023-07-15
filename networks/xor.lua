@@ -10,7 +10,7 @@
 -- hidden layers can successfully work like AND/NAND/OR, but will
 -- be unable to find a solution for XOR. The provided network--with 
 -- two inputs and a single hidden layer with two neurons--is the
--- simplest network I know of that can find a solution for XOR.
+-- simplest network that can find a solution for XOR.
 -- ==============================================================
 
 local v = require("visualizer")
@@ -24,7 +24,7 @@ local inputs = {
 	{1, 0},
 	{1, 1},
 }
--- the correct outputs for a gate given the inputs above
+-- the set of correct outputs for a gate given the inputs above
 local xorExpected = {
 	{0},
 	{1},
@@ -65,7 +65,7 @@ local function load()
 	nn = network:new({2, 2, 1})
 	-- a table representing the grid where we will draw our network
 	-- see the documentation on renderGrid()
-	grid = {2, 4}
+	grid = {1, 4}
 	-- create drawing surfaces to display the network and our test outputs
 	networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
 	outputSurface1 = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))
@@ -80,10 +80,6 @@ local function update(dt)
 end
 
 local function draw()
-
-	-- draw the grid
-	v.renderGrid(grid, sw, sh)
-
 	-- update the surfaces
 
 	-- switch to the canvas for that surface
@@ -119,7 +115,11 @@ local function draw()
 
 	-- switch back to the main canvas
 	love.graphics.setCanvas()
-	-- draw the surfaces onto the main canvas
+
+	-- render the grid to the screen 
+	v.renderGrid(grid, sw, sh)
+
+	-- render the surfaces onto the screen
 	instance.renderSurface(networkSurface)
 	instance.renderSurface(outputSurface1)
 	instance.renderSurface(outputSurface2)

@@ -52,7 +52,7 @@ function network:backprop(ti, to)
 	for i=1, #ti do
 		self:forward(ti[i])
 
-		-- clear partial derivatives of the outputs of the node from previous epochs
+		-- clear partial derivatives of the outputs of the node from previous inputs
 		for l=1, #self.layers do
 			for j=1, self.layers[l].numNodes do
 				self.layers[l].derivs[j] = 0
@@ -68,7 +68,7 @@ function network:backprop(ti, to)
 			for j=1, self.layers[l].numNodes do
 				local a = self.layers[l].outputs[j]
 				local da = self.layers[l].derivs[j]
-				local q = self.layers[l].activationPrime(self.layers[l].inputs[j])
+				local q = self.layers[l].activationPrime(self.layers[l].weightedInputs[j])
 				self.layers[l].biasGradients[j] = self.layers[l].biasGradients[j] + da*q
 				for k=1, self.layers[l].numInputs do
 					local pa
