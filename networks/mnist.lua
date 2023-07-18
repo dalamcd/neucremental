@@ -223,14 +223,30 @@ local function update(dt)
 
 	-- train the network
 	if training then
-		local idx = (iterations % #inputBatches) + 1
-		if idx == 1 then
+		-- local idx = (iterations % #inputBatches) + 1
+		-- if idx == 1 then
+		-- 	instance.shuffleArray(inputBatches, expectedBatches)
+		-- 	instance.shuffleBatches(inputBatches, expectedBatches)
+		-- end
+		-- local trainArr, expectArr = inputBatches[idx], expectedBatches[idx]
+		-- nn:learn(trainArr, expectArr, 1)
+
+		local numRuns = 10
+		local idx = (iterations % #inputBatches)
+		if idx == 0 then
 			instance.shuffleArray(inputBatches, expectedBatches)
 			instance.shuffleBatches(inputBatches, expectedBatches)
 		end
-		local trainArr, expectArr = inputBatches[idx], expectedBatches[idx]
-		nn:learn(trainArr, expectArr, 1)
-		iterations = iterations + 1
+
+		if #inputBatches - idx < numRuns then
+			numRuns = #inputBatches - idx
+		end
+
+		for i=1, numRuns do
+			nn:learn(inputBatches[idx + i], expectedBatches[idx + i], 1)
+			iterations = iterations + 1
+		end
+
 	end
 end
 
@@ -279,7 +295,7 @@ local function draw()
 		drawPixelGrid(pixelSurface, 28, 28)
 
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
-		"  Left mouse - draw pixels\n  Right mouse - erase pixels"
+		"tab - switch between network view and heatmap\n  Left mouse - draw pixels\n  Right mouse - erase pixels"
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, controls)
 	-- draw the surfaces to the main canvas
