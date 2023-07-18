@@ -17,7 +17,7 @@ local instance = require("instance")
 local v = require("visualizer")
 
 -- network data
-local imgPath = "networks/alphatest.png"
+local imgPath = "networks/10057.png" -- see the networks folder for other example images, or use any 28x28 image
 local pixels, imgw, imgh
 local inputs, expected
 local inputBatches, expectedBatches
@@ -73,7 +73,7 @@ local function load()
 	expected = {}
 	inputs = {}
 	graphdata = {}
-	nn = network:new({2, 7, 9, 7, 3})
+	nn = network:new({2, 7, 7, 3})
 
 	local imgData = love.image.newImageData(imgPath)
 	imgw, imgh = imgData:getWidth(), imgData:getHeight()
@@ -130,7 +130,7 @@ local function draw()
 			drawPixels(x, y, 256, 256, upscaledPixels)
 	end
 
-	if iterations % 50 == 0 then
+	if iterations % 10 == 0 then
 		love.graphics.setCanvas(outputSurface.canvas)
 			local pixelsOut = {}
 			for i=0, imgw - 1 do
@@ -144,7 +144,7 @@ local function draw()
 			drawPixels(x, y, imgw, imgh, pixelsOut, scalar)
 	end
 
-	if iterations % 10 == 0 then
+	if iterations % 50 == 0 then
 		local lastCost = nn:cost(inputs, expected)
 		table.insert(graphdata, lastCost)
 		if lastCost > highCost then highCost = lastCost end
@@ -156,8 +156,10 @@ local function draw()
 	love.graphics.setCanvas(networkSurface.canvas)
 		if view == 0 then
 			v.drawNetwork(networkSurface, nn, true)
+			networkSurface.forceDrawHeatmap = true
 		elseif view == 1 then
 			v.drawNetworkHeatmap(networkSurface, nn)
+			networkSurface.forceDrawHeatmap = true
 		elseif view == 2 then
 			local mx, my = love.mouse.getPosition()
 			local x = outputSurface.w/2 - imgw*scalar/2
@@ -166,13 +168,18 @@ local function draw()
 			if gx >= 0 then
 				nn:forward({gx/imgw, gy/imgh})
 				v.drawActivationHeatmap(networkSurface, nn)
+			elseif networkSurface.forceDrawHeatmap then
+				nn:forward({0, 0})
+				v.drawActivationHeatmap(networkSurface, nn)
 			end
+			networkSurface.forceDrawHeatmap = false
 		end
 
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, "The leftmost view shows the source image, the next view shows the network's " ..
 		"current picture of the source. Press the spacebar to see an upscaled version of the network's picture " ..
-		"of the low resolution image displayed in the third space")
+		"of the low resolution image displayed in the third space. Press tab to switch between network view; heatmap view; and " ..
+		"an activation heatmap (mouse over the left image to see how each neuron responds to those x,y coordinates)")
 	love.graphics.setCanvas()
 	instance.renderSurface(inputSurface)
 	instance.renderSurface(outputSurface)

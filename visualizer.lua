@@ -311,12 +311,13 @@ local function drawText(surface, str)
 	love.graphics.printf(str, 0, 0, surface.w, "left")
 end
 
-local function drawGraph(surface, data, min, max)
+local function drawGraph(surface, data, min, max, color)
 	if #data == 0 then return end
 	love.graphics.clear()
 	love.graphics.push("all")
 	love.graphics.setLineWidth(1)
-	love.graphics.setColor(1, 0, 0, 1)
+	color = color or {1, 0, 0, 1}
+	love.graphics.setColor(color)
 
 	local xstep = 1
 	local w, h = surface.w, surface.h
