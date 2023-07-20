@@ -133,8 +133,8 @@ local function clearCanvas()
 end
 
 local function load()
-	local images = assert(io.open("networks/t10k-images.idx3-ubyte", "rb"))
-	local labels = assert(io.open("networks/t10k-labels.idx1-ubyte", "rb"))
+	local images = assert(love.filesystem.newFile("networks/t10k-images.idx3-ubyte", "r"))
+	local labels = assert(love.filesystem.newFile("networks/t10k-labels.idx1-ubyte", "r"))
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
 	nn = network:new({784, 16, 16, 10})
