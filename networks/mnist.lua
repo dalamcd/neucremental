@@ -287,7 +287,8 @@ local function draw()
 		drawPixelGrid(pixelSurface, 28, 28)
 
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
-		"  tab - switch between network view and heatmap\n  Left mouse - draw pixels\n  Right mouse - erase pixels"
+		"  tab - switch between network view and heatmap\n  Left mouse - draw pixels\n  Right mouse - erase pixels\n\n " ..
+		"esc - return to network select screen"
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, controls)
 	-- draw the surfaces to the main canvas

@@ -308,7 +308,7 @@ end
 
 local function drawText(surface, str)
 	love.graphics.clear()
-	love.graphics.printf(str, 0, 0, surface.w, "left")
+	love.graphics.printf(str, 2, 0, surface.w - 2, "left")
 end
 
 local function drawGraph(surface, data, min, max, color)

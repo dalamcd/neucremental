@@ -59,15 +59,17 @@ local outputSurface1
 local outputSurface2
 local outputSurface3
 local outputSurface4
+local textSurface
 
 local function load()
 	-- initialize a network with 2 inputs, 1 hidden layer with 2 neurons, and 1 output
 	nn = network:new({2, 2, 1})
 	-- a table representing the grid where we will draw our network
 	-- see the documentation on renderGrid()
-	grid = {1, 4}
+	grid = {{4, 1}, 4}
 	-- create drawing surfaces to display the network and our test outputs
 	networkSurface = instance.createSurface(v.gridCell(grid, sw, sh, 1, 1))
+	textSurface = 	 instance.createSurface(v.gridCell(grid, sw, sh, 1, 2))
 	outputSurface1 = instance.createSurface(v.gridCell(grid, sw, sh, 2, 1))
 	outputSurface2 = instance.createSurface(v.gridCell(grid, sw, sh, 2, 2))
 	outputSurface3 = instance.createSurface(v.gridCell(grid, sw, sh, 2, 3))
@@ -113,6 +115,15 @@ local function draw()
 		-- paint to the network canvas
 		v.drawNetwork(networkSurface, nn, true)
 
+	-- switch to the text surface
+	love.graphics.setCanvas(textSurface.canvas)
+		v.drawText(textSurface,
+		"A representation of a XOR logic gate. The view to the left displays a picture " ..
+		"of the current network and the strengths of the weights between neurons. Below " ..
+		"are views on the network's output when given the inputs listed. Press escape to " ..
+		"return the network selection screen."
+	)
+
 	-- switch back to the main canvas
 	love.graphics.setCanvas()
 
@@ -121,6 +132,7 @@ local function draw()
 
 	-- render the surfaces onto the screen
 	instance.renderSurface(networkSurface)
+	instance.renderSurface(textSurface)
 	instance.renderSurface(outputSurface1)
 	instance.renderSurface(outputSurface2)
 	instance.renderSurface(outputSurface3)
