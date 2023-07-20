@@ -133,8 +133,8 @@ local function clearCanvas()
 end
 
 local function load()
-	local images = assert(io.open("networks/t10k-images.idx3-ubyte", "rb"))
-	local labels = assert(io.open("networks/t10k-labels.idx1-ubyte", "rb"))
+	local images = assert(love.filesystem.newFile("networks/t10k-images.idx3-ubyte", "r"))
+	local labels = assert(love.filesystem.newFile("networks/t10k-labels.idx1-ubyte", "r"))
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
 	nn = network:new({784, 16, 16, 10})
@@ -287,7 +287,8 @@ local function draw()
 		drawPixelGrid(pixelSurface, 28, 28)
 
 	local controls = "Controls:\n  i - toggle drawing inputs\n  c - clear pixel canvas\n  space - toggle training\n" ..
-		"  tab - switch between network view and heatmap\n  Left mouse - draw pixels\n  Right mouse - erase pixels"
+		"  tab - switch between network view and heatmap\n  Left mouse - draw pixels\n  Right mouse - erase pixels\n\n " ..
+		"esc - return to network select screen"
 	love.graphics.setCanvas(textSurface.canvas)
 		v.drawText(textSurface, controls)
 	-- draw the surfaces to the main canvas
